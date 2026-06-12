@@ -7,7 +7,10 @@ import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Service
 
 @Service
-class PaymentConsumer(private val objectMapper: ObjectMapper) {
+class PaymentConsumer(
+    private val objectMapper: ObjectMapper,
+    private val failedMessageStore: FailedMessageStore
+) {
 
     @KafkaListener(topics = ["payments"], groupId = "payments-consumer-group", containerFactory = "listenerContainerFactory")
     fun handle(
@@ -23,14 +26,12 @@ class PaymentConsumer(private val objectMapper: ObjectMapper) {
         println("Partition $partition | ${payment.paymentId} | ${payment.amount} ${payment.currency} | ${payment.fromAccount} → ${payment.toAccount}")
     }
 
-    @KafkaListener(topics = ["payments-dlt"], 
-        groupId = "payments-dlt-consumer-group", 
-        containerFactory = "listenerContainerFactory",
-        )
+    @KafkaListener(topics = ["payments-dlt"], groupId = "payments-dlt-consumer-group", containerFactory = "listenerContainerFactory")
     fun handleDlt(
         json: String,
         @Header(KafkaHeaders.RECEIVED_TOPIC) topic: String
     ) {
         println("DLT | Failed message from $topic: $json")
+        failedMessageStore.add(json)
     }
 }

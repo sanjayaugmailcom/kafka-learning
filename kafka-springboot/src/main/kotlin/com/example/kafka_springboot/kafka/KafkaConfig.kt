@@ -50,7 +50,9 @@ class KafkaConfig(
             org.apache.kafka.common.TopicPartition("payments-dlt", record.partition())
         }
         // retry 3 times with a 1 second gap, then send to DLT
-        return DefaultErrorHandler(recoverer, FixedBackOff(1000L, 3))
+        return DefaultErrorHandler(recoverer, FixedBackOff(1000L, 3)).apply {
+            addNotRetryableExceptions(IllegalArgumentException::class.java)
+        }
     }
 
     @Bean
