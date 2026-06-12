@@ -1,0 +1,19 @@
+# Gradle build outputs and caches
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Spring Boot
+HELP.md
+
+# OS
+.DS_Store
+Thumbs.db
