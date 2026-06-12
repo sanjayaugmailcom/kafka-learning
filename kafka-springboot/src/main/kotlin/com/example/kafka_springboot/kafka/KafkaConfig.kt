@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.*
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer
+import org.springframework.kafka.listener.DefaultErrorHandler
+import org.springframework.util.backoff.FixedBackOff
 
 @Configuration
 class KafkaConfig(
@@ -42,9 +45,22 @@ class KafkaConfig(
     }
 
     @Bean
-    fun listenerContainerFactory(cf: ConsumerFactory<String, String>): ConcurrentKafkaListenerContainerFactory<String, String> {
+    fun errorHandler(kafkaTemplate: KafkaTemplate<String, String>): DefaultErrorHandler {
+        val recoverer = DeadLetterPublishingRecoverer(kafkaTemplate) { record, _ ->
+            org.apache.kafka.common.TopicPartition("payments-dlt", record.partition())
+        }
+        // retry 3 times with a 1 second gap, then send to DLT
+        return DefaultErrorHandler(recoverer, FixedBackOff(1000L, 3))
+    }
+
+    @Bean
+    fun listenerContainerFactory(
+        cf: ConsumerFactory<String, String>,
+        errorHandler: DefaultErrorHandler
+    ): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.setConsumerFactory(cf)
+        factory.setCommonErrorHandler(errorHandler)
         return factory
     }
 }

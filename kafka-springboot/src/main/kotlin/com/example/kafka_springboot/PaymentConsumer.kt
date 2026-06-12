@@ -15,6 +15,22 @@ class PaymentConsumer(private val objectMapper: ObjectMapper) {
         @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int
     ) {
         val payment = objectMapper.readValue(json, PaymentRequest::class.java)
+
+        if (payment.amount <= java.math.BigDecimal.ZERO) {
+            throw IllegalArgumentException("Invalid amount: ${payment.amount}")
+        }
+
         println("Partition $partition | ${payment.paymentId} | ${payment.amount} ${payment.currency} | ${payment.fromAccount} → ${payment.toAccount}")
+    }
+
+    @KafkaListener(topics = ["payments-dlt"], 
+        groupId = "payments-dlt-consumer-group", 
+        containerFactory = "listenerContainerFactory",
+        )
+    fun handleDlt(
+        json: String,
+        @Header(KafkaHeaders.RECEIVED_TOPIC) topic: String
+    ) {
+        println("DLT | Failed message from $topic: $json")
     }
 }
