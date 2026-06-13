@@ -2,6 +2,7 @@ package com.example.kafka_springboot
 
 import org.apache.avro.generic.GenericRecord
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.support.Acknowledgment
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Service
@@ -16,7 +17,8 @@ class PaymentConsumer(
     @KafkaListener(topics = ["payments"], groupId = "payments-consumer-group", containerFactory = "listenerContainerFactory")
     fun handle(
         record: GenericRecord,
-        @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int
+        @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int,
+        ack: Acknowledgment
     ) {
         val paymentId = record["paymentId"].toString()
         val amount = BigDecimal(record["amount"].toString())
@@ -27,10 +29,12 @@ class PaymentConsumer(
 
         if (!processedPaymentStore.recordIfAbsent(paymentId)) {
             println("Duplicate | Skipping already-processed payment $paymentId")
+            ack.acknowledge()
             return
         }
 
         println("Partition $partition | $paymentId | $amount ${record["currency"]} | ${record["fromAccount"]} → ${record["toAccount"]}")
+        ack.acknowledge()
     }
 
     @KafkaListener(topics = ["payments-dlt"], groupId = "payments-dlt-consumer-group", containerFactory = "listenerContainerFactory")

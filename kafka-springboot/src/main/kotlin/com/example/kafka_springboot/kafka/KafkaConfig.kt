@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.TopicBuilder
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.*
+import org.springframework.kafka.listener.ContainerProperties
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer
 import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.util.backoff.FixedBackOff
@@ -79,6 +80,7 @@ class KafkaConfig(
         val factory = ConcurrentKafkaListenerContainerFactory<String, GenericRecord>()
         factory.setConsumerFactory(cf)
         factory.setCommonErrorHandler(errorHandler)
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL
         return factory
     }
 }
