@@ -16,6 +16,7 @@ java {
 
 repositories {
 	mavenCentral()
+	maven("https://packages.confluent.io/maven/")
 }
 
 dependencies {
@@ -23,6 +24,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("tools.jackson.module:jackson-module-kotlin")
+	implementation("io.confluent:kafka-avro-serializer:7.6.1")
+	implementation("org.apache.avro:avro:1.11.4")
 	testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

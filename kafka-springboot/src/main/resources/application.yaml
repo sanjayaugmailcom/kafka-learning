@@ -3,3 +3,7 @@ spring:
     name: kafka-springboot
   kafka:
     bootstrap-servers: localhost:9092
+    schema-registry-url: http://localhost:8085
+    consumer:
+      session.timeout.ms: 10000
+      heartbeat.interval.ms: 3000
