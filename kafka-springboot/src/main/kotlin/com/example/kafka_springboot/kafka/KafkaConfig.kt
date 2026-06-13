@@ -39,7 +39,11 @@ class KafkaConfig(
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
             ProducerConfig.PARTITIONER_CLASS_CONFIG to RoundRobinPartitioner::class.java,
-            AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to schemaRegistryUrl
+            AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to schemaRegistryUrl,
+            ProducerConfig.ACKS_CONFIG to "all",
+            ProducerConfig.LINGER_MS_CONFIG to 5,
+            ProducerConfig.BATCH_SIZE_CONFIG to 65536,
+            ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to true
         )
         return DefaultKafkaProducerFactory(config)
     }
