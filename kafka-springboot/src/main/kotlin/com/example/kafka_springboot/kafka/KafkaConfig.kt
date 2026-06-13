@@ -12,6 +12,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.kafka.config.TopicBuilder
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.*
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer
@@ -23,6 +24,12 @@ class KafkaConfig(
     @Value("\${spring.kafka.bootstrap-servers}") private val bootstrapServers: String,
     @Value("\${spring.kafka.schema-registry-url}") private val schemaRegistryUrl: String
 ) {
+
+    @Bean
+    fun paymentsTopic() = TopicBuilder.name("payments").partitions(3).build()
+
+    @Bean
+    fun paymentsDltTopic() = TopicBuilder.name("payments-dlt").partitions(3).build()
 
     @Bean
     fun producerFactory(): ProducerFactory<String, Any> {

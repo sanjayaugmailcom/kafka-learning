@@ -19,15 +19,15 @@ class PaymentConsumer(
         @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int
     ) {
         val paymentId = record["paymentId"].toString()
+        val amount = BigDecimal(record["amount"].toString())
+
+        if (amount <= BigDecimal.ZERO) {
+            throw IllegalArgumentException("Invalid amount: $amount")
+        }
 
         if (!processedPaymentStore.recordIfAbsent(paymentId)) {
             println("Duplicate | Skipping already-processed payment $paymentId")
             return
-        }
-
-        val amount = BigDecimal(record["amount"].toString())
-        if (amount <= BigDecimal.ZERO) {
-            throw IllegalArgumentException("Invalid amount: $amount")
         }
 
         println("Partition $partition | $paymentId | $amount ${record["currency"]} | ${record["fromAccount"]} → ${record["toAccount"]}")

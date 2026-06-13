@@ -1,32 +1,36 @@
 package com.example.kafka_springboot
 
-import org.apache.avro.Schema
-import org.apache.avro.generic.GenericData
-import org.apache.avro.generic.GenericRecord
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import tools.jackson.databind.ObjectMapper
 
 @RestController
 class PaymentController(
-    private val kafka: KafkaTemplate<String, Any>
+    private val paymentRepository: PaymentRepository,
+    private val outboxEventRepository: OutboxEventRepository,
+    private val objectMapper: ObjectMapper
 ) {
-    private val schema: Schema = Schema.Parser().parse(
-        PaymentController::class.java.getResourceAsStream("/avro/PaymentRequest.avsc")
-    )
 
     @PostMapping("/payments")
-    fun send(@RequestBody payment: PaymentRequest): String {
-        val record: GenericRecord = GenericData.Record(schema).apply {
-            put("paymentId", payment.paymentId)
-            put("amount", payment.amount.toPlainString())
-            put("currency", payment.currency)
-            put("fromAccount", payment.fromAccount)
-            put("toAccount", payment.toAccount)
-        }
-        kafka.send(ProducerRecord("payments", payment.paymentId, record))
-        return "Queued payment ${payment.paymentId}"
+    @Transactional
+    fun send(@RequestBody request: PaymentRequest): String {
+        val payment = Payment(
+            paymentId = request.paymentId,
+            amount = request.amount,
+            currency = request.currency,
+            fromAccount = request.fromAccount,
+            toAccount = request.toAccount
+        )
+        paymentRepository.save(payment)
+
+        val outboxEvent = OutboxEvent(
+            aggregateId = request.paymentId,
+            payload = objectMapper.writeValueAsString(request)
+        )
+        outboxEventRepository.save(outboxEvent)
+
+        return "Accepted payment ${request.paymentId}"
     }
 }

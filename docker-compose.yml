@@ -1,4 +1,14 @@
 services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: payments
+      POSTGRES_USER: payments_user
+      POSTGRES_PASSWORD: secret
+
   kafka:
     image: confluentinc/cp-kafka:7.6.1
     hostname: kafka
