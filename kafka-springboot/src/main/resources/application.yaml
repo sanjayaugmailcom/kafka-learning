@@ -15,3 +15,7 @@ spring:
     consumer:
       session.timeout.ms: 10000
       heartbeat.interval.ms: 3000
+    streams:
+      application-id: payment-streams-app
+      properties:
+        schema.registry.url: http://localhost:8085

@@ -12,6 +12,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.kafka.annotation.EnableKafkaStreams
 import org.springframework.kafka.config.TopicBuilder
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.*
@@ -21,6 +22,7 @@ import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.util.backoff.FixedBackOff
 
 @Configuration
+@EnableKafkaStreams
 class KafkaConfig(
     @Value("\${spring.kafka.bootstrap-servers}") private val bootstrapServers: String,
     @Value("\${spring.kafka.schema-registry-url}") private val schemaRegistryUrl: String
@@ -31,6 +33,9 @@ class KafkaConfig(
 
     @Bean
     fun paymentsDltTopic() = TopicBuilder.name("payments-dlt").partitions(3).build()
+
+    @Bean
+    fun paymentTotalsTopic() = TopicBuilder.name("payment-totals").partitions(3).build()
 
     @Bean
     fun producerFactory(): ProducerFactory<String, Any> {
