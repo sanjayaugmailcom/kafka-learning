@@ -7,12 +7,16 @@ import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
+import org.apache.kafka.streams.kstream.Aggregator
 import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.Grouped
+import org.apache.kafka.streams.kstream.Initializer
 import org.apache.kafka.streams.kstream.KStream
+import org.apache.kafka.streams.kstream.KTable
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.kstream.TimeWindows
+import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.WindowStore
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -76,5 +80,43 @@ class PaymentStreamsTopology(
             .to("payment-totals", Produced.with(Serdes.String(), Serdes.String()))
 
         return stream
+    }
+
+    @Bean
+    fun paymentAmountTotalsTable(builder: StreamsBuilder): KTable<String, Double> {
+        val avroSerde = GenericAvroSerde().apply {
+            configure(mapOf(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to schemaRegistryUrl), false)
+        }
+
+        val table: KTable<String, Double> = builder
+            .stream("payments", Consumed.with(Serdes.String(), avroSerde))
+
+            // Re-key by currency so all USD payments share the same key.
+            .selectKey { _, value -> value.get("currency").toString() }
+
+            // Group all records that share the same key together.
+            .groupByKey(Grouped.with(Serdes.String(), avroSerde))
+
+            // aggregate() is the general form of count().
+            // - initializer: starting value for a key we've never seen before (like the seed in C# Aggregate)
+            // - adder: called for every new record; receives (key, newValue, currentAccumulator) → newAccumulator
+            // - Materialized: names the state store and declares the serdes for key (String) and value (Double)
+            .aggregate(
+                Initializer<Double> { 0.0 },
+                Aggregator<String, GenericRecord, Double> { _, record, runningTotal ->
+                    runningTotal + record.get("amount").toString().toDouble()
+                },
+                Materialized.`as`<String, Double, KeyValueStore<Bytes, ByteArray>>("payment-amount-store")
+                    .withKeySerde(Serdes.String())
+                    .withValueSerde(Serdes.Double())
+            )
+
+        // Write the KTable to an output topic so other services can consume it.
+        // toStream() converts KTable → KStream; each update to the table emits a new record.
+        table.toStream()
+            .map { currency, total -> KeyValue(currency, total.toString()) }
+            .to("payment-amount-totals", Produced.with(Serdes.String(), Serdes.String()))
+
+        return table
     }
 }
