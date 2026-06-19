@@ -26,5 +26,7 @@ spring:
       heartbeat.interval.ms: 3000
     streams:
       application-id: payment-streams-app
+      cleanup:
+        on-startup: true
       properties:
         schema.registry.url: http://localhost:8085

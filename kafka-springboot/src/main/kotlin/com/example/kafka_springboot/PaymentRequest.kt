@@ -7,5 +7,6 @@ data class PaymentRequest(
     val amount: BigDecimal,
     val currency: String,
     val fromAccount: String,
-    val toAccount: String
+    val toAccount: String,
+    val description: String = ""
 )

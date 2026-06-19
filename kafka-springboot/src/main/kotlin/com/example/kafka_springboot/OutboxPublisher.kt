@@ -34,6 +34,7 @@ class OutboxPublisher(
                 put("currency", payment.currency)
                 put("fromAccount", payment.fromAccount)
                 put("toAccount", payment.toAccount)
+                put("description", payment.description)
             }
             kafka.send(ProducerRecord("payments", event.aggregateId, record)).get()
 

@@ -37,9 +37,9 @@ Covered:
 - Idempotent consumers
 
 Remaining gaps (in priority order):
-1. Kafka Streams — KStream, KTable, windowing (heavily tested)
-2. Kafka Connect — source + sink connectors (heavily tested)
-3. Schema compatibility rules — backward, forward, full
+1. ~~Kafka Streams — KStream, KTable, windowing (heavily tested)~~ ✓ DONE
+2. ~~Kafka Connect — source connector (Debezium CDC)~~ ✓ DONE | sink connector — still needed
+3. ~~Schema compatibility rules — backward, forward, full~~ ✓ DONE
 4. Exactly-once semantics — transactional producer API
 5. Log compaction — key-based retention
 6. ksqlDB — stream processing with SQL
@@ -48,6 +48,15 @@ Remaining gaps (in priority order):
 Completed:
 - Offset management — manual commits, enable.auto.commit, auto.offset.reset
 - Producer config deep dive — acks, linger.ms, batch.size, enable.idempotence
+
+## Interview target: high-throughput system design
+Be able to explain and partially demonstrate how a 10,000 TPS payment system is built:
+- Partitioning for parallelism (already built)
+- Producer batching — linger.ms, batch.size (already configured)
+- Outbox pattern for async decoupling (already built)
+- Debezium CDC to replace polling outbox (done)
+- Horizontal scaling — multiple app instances, each owning partitions
+- Sharding the DB by account ID to remove the single-DB bottleneck
 
 ## Current project
 Building a REST API with Spring Boot + Kotlin, PostgreSQL, Docker, tested with JUnit + Testcontainers.

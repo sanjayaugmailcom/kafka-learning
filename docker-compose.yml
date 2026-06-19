@@ -8,6 +8,7 @@ services:
       POSTGRES_DB: payments
       POSTGRES_USER: payments_user
       POSTGRES_PASSWORD: secret
+    command: ["postgres", "-c", "wal_level=logical"]
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
@@ -54,3 +55,18 @@ services:
     depends_on:
       - kafka
       - schema-registry
+
+  kafka-connect:
+    image: debezium/connect:2.7.3.Final
+    container_name: kafka-connect
+    ports:
+      - "8083:8083"
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: kafka-connect-group
+      CONFIG_STORAGE_TOPIC: connect-configs
+      OFFSET_STORAGE_TOPIC: connect-offsets
+      STATUS_STORAGE_TOPIC: connect-status
+    depends_on:
+      - kafka
+      - postgres
