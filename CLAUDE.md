@@ -35,12 +35,16 @@ Covered:
 - Dead Letter Topic + retry
 - Avro + Schema Registry
 - Idempotent consumers
+- Kafka Streams — KStream, KTable, windowing
+- Kafka Connect — source connector (Debezium CDC) + sink connector (JDBC)
+- Schema compatibility rules — backward, forward, full
+- Exactly-once semantics — transactional producer, sendOffsetsToTransaction, isolation.level
 
 Remaining gaps (in priority order):
 1. ~~Kafka Streams — KStream, KTable, windowing (heavily tested)~~ ✓ DONE
 2. ~~Kafka Connect — source + sink connectors~~ ✓ DONE
 3. ~~Schema compatibility rules — backward, forward, full~~ ✓ DONE
-4. Exactly-once semantics — transactional producer API
+4. ~~Exactly-once semantics — transactional producer API~~ ✓ DONE
 5. Log compaction — key-based retention
 6. ksqlDB — stream processing with SQL
 7. Replication + ISR — in-sync replicas, leader election

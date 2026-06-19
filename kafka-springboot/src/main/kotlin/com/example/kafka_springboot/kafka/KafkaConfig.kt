@@ -38,6 +38,9 @@ class KafkaConfig(
     fun paymentTotalsTopic() = TopicBuilder.name("payment-totals").partitions(3).build()
 
     @Bean
+    fun paymentsHighValueTopic() = TopicBuilder.name("payments-high-value").partitions(3).build()
+
+    @Bean
     fun producerFactory(): ProducerFactory<String, Any> {
         val config = mapOf(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
