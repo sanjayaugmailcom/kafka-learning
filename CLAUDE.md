@@ -38,7 +38,7 @@ Covered:
 
 Remaining gaps (in priority order):
 1. ~~Kafka Streams — KStream, KTable, windowing (heavily tested)~~ ✓ DONE
-2. ~~Kafka Connect — source connector (Debezium CDC)~~ ✓ DONE | sink connector — still needed
+2. ~~Kafka Connect — source + sink connectors~~ ✓ DONE
 3. ~~Schema compatibility rules — backward, forward, full~~ ✓ DONE
 4. Exactly-once semantics — transactional producer API
 5. Log compaction — key-based retention

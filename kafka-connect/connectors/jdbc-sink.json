@@ -1,0 +1,25 @@
+{
+  "name": "jdbc-sink-payments",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+
+    "topics": "payments",
+
+    "connection.url": "jdbc:postgresql://postgres:5432/payments",
+    "connection.user": "payments_user",
+    "connection.password": "secret",
+
+    "table.name.format": "payments_sink",
+    "auto.create": "true",
+    "auto.evolve": "true",
+
+    "insert.mode": "upsert",
+    "pk.mode": "record_value",
+    "pk.fields": "paymentId",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schema-registry:8085"
+  }
+}
