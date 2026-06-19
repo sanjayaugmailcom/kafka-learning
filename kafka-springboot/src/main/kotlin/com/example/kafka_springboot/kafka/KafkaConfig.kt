@@ -7,6 +7,7 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
+import org.apache.kafka.common.config.TopicConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
@@ -39,6 +40,29 @@ class KafkaConfig(
 
     @Bean
     fun paymentsHighValueTopic() = TopicBuilder.name("payments-high-value").partitions(3).build()
+
+    @Bean
+    fun accountBalancesTopic() = TopicBuilder.name("account-balances")
+        .partitions(1)
+        .config(TopicConfig.CLEANUP_POLICY_CONFIG, TopicConfig.CLEANUP_POLICY_COMPACT)
+        .config(TopicConfig.SEGMENT_MS_CONFIG, "10000")           // roll segment every 10s so compaction can run
+        .config(TopicConfig.MIN_CLEANABLE_DIRTY_RATIO_CONFIG, "0.01") // compact aggressively (default is 0.5)
+        .config(TopicConfig.DELETE_RETENTION_MS_CONFIG, "1000")   // keep tombstones for 1s then discard
+        .build()
+
+    @Bean
+    fun stringProducerFactory(): ProducerFactory<String, String> {
+        val config = mapOf(
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
+            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java
+        )
+        return DefaultKafkaProducerFactory(config)
+    }
+
+    @Bean
+    fun stringKafkaTemplate(sf: ProducerFactory<String, String>): KafkaTemplate<String, String> =
+        KafkaTemplate(sf)
 
     @Bean
     fun producerFactory(): ProducerFactory<String, Any> {
