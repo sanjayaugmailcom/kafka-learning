@@ -46,7 +46,7 @@ Remaining gaps (in priority order):
 3. ~~Schema compatibility rules — backward, forward, full~~ ✓ DONE
 4. ~~Exactly-once semantics — transactional producer API~~ ✓ DONE
 5. ~~Log compaction — key-based retention~~ ✓ DONE
-6. ksqlDB — stream processing with SQL
+6. ~~ksqlDB — stream processing with SQL~~ ✓ DONE
 7. Replication + ISR — in-sync replicas, leader election
 
 Completed:
