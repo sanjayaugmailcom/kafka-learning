@@ -39,6 +39,9 @@ Covered:
 - Kafka Connect — source connector (Debezium CDC) + sink connector (JDBC)
 - Schema compatibility rules — backward, forward, full
 - Exactly-once semantics — transactional producer, sendOffsetsToTransaction, isolation.level
+- Log compaction — key-based retention, tombstones, active vs closed segments
+- ksqlDB — STREAM vs TABLE, push vs pull queries, TUMBLING/HOPPING/SESSION windows
+- Replication + ISR — in-sync replicas, leader election, replication.factor, min.insync.replicas
 
 Remaining gaps (in priority order):
 1. ~~Kafka Streams — KStream, KTable, windowing (heavily tested)~~ ✓ DONE
@@ -47,7 +50,7 @@ Remaining gaps (in priority order):
 4. ~~Exactly-once semantics — transactional producer API~~ ✓ DONE
 5. ~~Log compaction — key-based retention~~ ✓ DONE
 6. ~~ksqlDB — stream processing with SQL~~ ✓ DONE
-7. Replication + ISR — in-sync replicas, leader election
+7. ~~Replication + ISR — in-sync replicas, leader election~~ ✓ DONE
 
 Completed:
 - Offset management — manual commits, enable.auto.commit, auto.offset.reset
