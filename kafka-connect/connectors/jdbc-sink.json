@@ -8,7 +8,7 @@
 
     "connection.url": "jdbc:postgresql://postgres:5432/payments",
     "connection.user": "payments_user",
-    "connection.password": "secret",
+    "connection.password": "${DB_PASSWORD}",
 
     "table.name.format": "payments_sink",
     "auto.create": "true",

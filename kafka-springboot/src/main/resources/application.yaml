@@ -13,7 +13,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/payments
     username: payments_user
-    password: secret
+    password: ${DB_PASSWORD:secret}
   jpa:
     hibernate:
       ddl-auto: update

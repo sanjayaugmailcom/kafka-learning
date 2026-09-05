@@ -1,6 +1,7 @@
 # Gradle build outputs and caches
 .gradle/
 build/
+bin/
 !gradle/wrapper/gradle-wrapper.jar
 !**/gradle/wrapper/gradle-wrapper.jar
 
